@@ -17,60 +17,74 @@ export default function HeroSlider() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 4000); // Change image every 4 seconds
-
+    }, 4000);
     return () => clearInterval(timer);
   }, []);
 
   return (
     <section className="relative w-full h-[600px] sm:h-[700px] lg:h-[800px] overflow-hidden">
-      {/* Images */}
-      {images.map((img, index) => (
-        <div
-          key={index}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentIndex ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <img
-            src={img}
-            alt={`Hero Slide ${index + 1}`}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      ))}
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center px-4">
+      {/* ── Desktop slideshow images (hidden on mobile) ── */}
+      <div className="hidden md:block absolute inset-0">
+        {images.map((img, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              index === currentIndex ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <img
+              src={img}
+              alt={`Hero Slide ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+        {/* Dark overlay for desktop */}
+        <div className="absolute inset-0 bg-black/60" />
+      </div>
+
+      {/* ── Mobile background (shown only on mobile, no images) ── */}
+      <div className="md:hidden absolute inset-0 bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900">
+        {/* Subtle decorative circles */}
+        <div className="absolute top-[-80px] right-[-80px] w-72 h-72 rounded-full bg-blue-700/20 blur-3xl" />
+        <div className="absolute bottom-[-60px] left-[-60px] w-64 h-64 rounded-full bg-indigo-700/20 blur-3xl" />
+      </div>
+
+      {/* ── Hero text content (always visible) ── */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+        <p className="text-xs font-bold text-blue-300 uppercase tracking-widest mb-4 opacity-90">
+          Air University · Aerospace & Aviation Campus Kamra
+        </p>
         <h1
-          className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 to-blue-300 bg-clip-text text-transparent mb-6 leading-tight drop-shadow-sm"
+          className="text-4xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-400 to-blue-200 bg-clip-text text-transparent mb-5 leading-tight"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Air University FYP Expo 2026
+          FYP Expo 2026
         </h1>
-        <p className="text-xl sm:text-2xl text-gray-200 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-          Showcasing Innovation & Excellence
+        <p className="text-base sm:text-xl lg:text-2xl text-blue-100/80 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+          Showcasing Innovation &amp; Excellence in Final Year Projects
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-sm sm:max-w-none">
           <Link
             to="/projects"
-            className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 text-lg shadow-lg shadow-blue-900/50 hover:scale-105"
+            className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-7 py-3.5 rounded-xl transition-all duration-300 text-base shadow-lg shadow-blue-900/50 hover:scale-105"
           >
             🚀 Explore Projects
           </Link>
           <Link
             to="/submit"
-            className="inline-flex items-center justify-center gap-2 border-2 border-white/40 hover:border-white text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 text-lg hover:bg-white/10 hover:scale-105"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/30 hover:border-white text-white font-semibold px-7 py-3.5 rounded-xl transition-all duration-300 text-base hover:bg-white/10 hover:scale-105"
           >
             📤 Submit Project
           </Link>
         </div>
       </div>
 
-      {/* Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3">
+      {/* ── Slide indicators (desktop only) ── */}
+      <div className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 gap-3">
         {images.map((_, index) => (
           <button
             key={index}

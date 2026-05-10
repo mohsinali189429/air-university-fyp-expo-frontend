@@ -6,7 +6,6 @@ import Loader from "../components/Loader.jsx";
 const tierConfig = {
   Platinum: {
     label: "Platinum Sponsors",
-    icon: "💎",
     bg: "bg-gradient-to-br from-slate-50 to-blue-50",
     border: "border-slate-300",
     badge: "bg-slate-800 text-white",
@@ -15,7 +14,6 @@ const tierConfig = {
   },
   Gold: {
     label: "Gold Sponsors",
-    icon: "🥇",
     bg: "bg-gradient-to-br from-yellow-50 to-amber-50",
     border: "border-yellow-300",
     badge: "bg-yellow-500 text-white",
@@ -24,7 +22,6 @@ const tierConfig = {
   },
   Silver: {
     label: "Silver Sponsors",
-    icon: "🥈",
     bg: "bg-gradient-to-br from-gray-50 to-slate-50",
     border: "border-gray-300",
     badge: "bg-gray-500 text-white",
@@ -33,7 +30,6 @@ const tierConfig = {
   },
   Bronze: {
     label: "Bronze Sponsors",
-    icon: "🥉",
     bg: "bg-gradient-to-br from-orange-50 to-amber-50",
     border: "border-orange-200",
     badge: "bg-orange-600 text-white",

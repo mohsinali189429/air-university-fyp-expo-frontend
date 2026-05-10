@@ -77,7 +77,7 @@ export default function Projects() {
               {/* Search */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  🔍 Search
+                   Search
                 </label>
                 <input
                   type="text"
@@ -91,7 +91,7 @@ export default function Projects() {
               {/* Category Filter */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  📂 Category
+                   Category
                 </label>
                 <div className="space-y-1">
                   <button
@@ -128,7 +128,7 @@ export default function Projects() {
               {/* Sort */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  ↕️ Sort By
+                   Sort By
                 </label>
                 <select
                   value={sort}

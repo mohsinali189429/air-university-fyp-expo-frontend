@@ -34,10 +34,7 @@ function RejectModal({ title, onConfirm, onCancel, loading }) {
   const [reason, setReason] = useState("");
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div
-        className="absolute inset-0 bg-black/40"
-        onClick={onCancel}
-      />
+      <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 z-10">
         <h3 className="text-lg font-semibold text-slate-900 mb-1">
           Reject — {title}
@@ -104,6 +101,15 @@ function ProjectDetailModal({ project, onClose }) {
             {project.status === "rejected" && project.rejectionReason && (
               <p className="text-red-700 mt-1 text-xs">{project.rejectionReason}</p>
             )}
+          </DetailField>
+          <DetailField label="Featured">
+            <span
+              className={`text-sm font-semibold ${
+                project.isFeatured ? "text-yellow-600" : "text-slate-400"
+              }`}
+            >
+              {project.isFeatured ? "★ Featured" : "Not Featured"}
+            </span>
           </DetailField>
           <DetailField label="Department" value={project.department || "N/A"} />
           <DetailField label="Supervisor" value={project.supervisorName} />
@@ -186,16 +192,18 @@ function SidebarItem({ active, label, badge, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${active
+      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
+        active
           ? "bg-blue-600 text-white shadow-sm"
           : "text-slate-700 hover:bg-blue-50 hover:text-blue-700"
-        }`}
+      }`}
     >
       <span>{label}</span>
       {badge > 0 && (
         <span
-          className={`text-xs font-bold px-2 py-0.5 rounded-full ${active ? "bg-white/25 text-white" : "bg-blue-100 text-blue-700"
-            }`}
+          className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+            active ? "bg-white/25 text-white" : "bg-blue-100 text-blue-700"
+          }`}
         >
           {badge}
         </span>
@@ -260,9 +268,7 @@ export default function Admin() {
   const [editingProjectId, setEditingProjectId] = useState(null);
   const [viewingProject, setViewingProject] = useState(null);
 
-  // Rejection modal state
   const [rejectModal, setRejectModal] = useState(null);
-  // { type: "user" | "project", id: number, name: string }
 
   const isEditing = Boolean(editingProjectId);
 
@@ -306,19 +312,25 @@ export default function Admin() {
   );
   const totals = stats?.totals || {};
 
-  const userCounts = useMemo(() => ({
-    pending: users.filter((u) => u.approvalStatus === "pending").length,
-    approved: users.filter((u) => u.approvalStatus === "approved").length,
-    rejected: users.filter((u) => u.approvalStatus === "rejected").length,
-    all: users.length,
-  }), [users]);
+  const userCounts = useMemo(
+    () => ({
+      pending: users.filter((u) => u.approvalStatus === "pending").length,
+      approved: users.filter((u) => u.approvalStatus === "approved").length,
+      rejected: users.filter((u) => u.approvalStatus === "rejected").length,
+      all: users.length,
+    }),
+    [users]
+  );
 
-  const projectCounts = useMemo(() => ({
-    pending: projects.filter((p) => p.status === "pending").length,
-    approved: projects.filter((p) => p.status === "approved").length,
-    rejected: projects.filter((p) => p.status === "rejected").length,
-    all: projects.length,
-  }), [projects]);
+  const projectCounts = useMemo(
+    () => ({
+      pending: projects.filter((p) => p.status === "pending").length,
+      approved: projects.filter((p) => p.status === "approved").length,
+      rejected: projects.filter((p) => p.status === "rejected").length,
+      all: projects.length,
+    }),
+    [projects]
+  );
 
   // ── Filtered lists ──
   const filteredUsers = useMemo(() => {
@@ -365,7 +377,12 @@ export default function Admin() {
       setUsers((prev) =>
         prev.map((u) =>
           u.id === userId
-            ? { ...u, approvalStatus: updated.approvalStatus, isApproved: updated.isApproved, approvedAt: updated.approvedAt }
+            ? {
+                ...u,
+                approvalStatus: updated.approvalStatus,
+                isApproved: updated.isApproved,
+                approvedAt: updated.approvedAt,
+              }
             : u
         )
       );
@@ -382,19 +399,13 @@ export default function Admin() {
     setActionLoading(true);
     setError("");
     try {
-      const res = await api.patch(`/admin/users/${rejectModal.id}/reject`, {
+      await api.patch(`/admin/users/${rejectModal.id}/reject`, {
         rejectionReason: reason,
       });
-      const updated = res.data?.user;
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === rejectModal.id
-            ? { ...u, approvalStatus: updated.approvalStatus, isApproved: updated.isApproved, rejectionReason: updated.rejectionReason }
-            : u
-        )
-      );
+      // Backend deletes the record on rejection — remove from local state
+      setUsers((prev) => prev.filter((u) => u.id !== rejectModal.id));
       setRejectModal(null);
-      showSuccess("User rejected and notified by email.");
+      showSuccess("User rejected, notified by email, and record removed.");
     } catch (err) {
       setError(err.response?.data?.error || "Failed to reject user.");
     } finally {
@@ -409,7 +420,8 @@ export default function Admin() {
     try {
       const res = await api.patch(`/admin/projects/${projectId}/approve`);
       const updated = res.data?.project;
-      if (updated) setProjects((prev) => prev.map((p) => (p.id === projectId ? updated : p)));
+      if (updated)
+        setProjects((prev) => prev.map((p) => (p.id === projectId ? updated : p)));
       showSuccess("Project approved and submitter notified.");
     } catch (err) {
       setError(err.response?.data?.error || "Failed to approve project.");
@@ -427,7 +439,10 @@ export default function Admin() {
         rejectionReason: reason,
       });
       const updated = res.data?.project;
-      if (updated) setProjects((prev) => prev.map((p) => (p.id === rejectModal.id ? updated : p)));
+      if (updated)
+        setProjects((prev) =>
+          prev.map((p) => (p.id === rejectModal.id ? updated : p))
+        );
       setRejectModal(null);
       showSuccess("Project rejected and submitter notified.");
     } catch (err) {
@@ -438,7 +453,8 @@ export default function Admin() {
   }
 
   async function handleDeleteProject(id) {
-    if (!window.confirm("Permanently delete this project? This cannot be undone.")) return;
+    if (!window.confirm("Permanently delete this project? This cannot be undone."))
+      return;
     setError("");
     try {
       await api.delete(`/admin/projects/${id}`);
@@ -447,6 +463,26 @@ export default function Admin() {
       showSuccess("Project deleted.");
     } catch (err) {
       setError(err.response?.data?.error || "Failed to delete project.");
+    }
+  }
+
+  async function handleToggleFeatured(projectId, currentFeatured) {
+    setActionLoading(true);
+    setError("");
+    try {
+      const res = await api.patch(`/admin/projects/${projectId}/featured`);
+      const updated = res.data?.project;
+      if (updated)
+        setProjects((prev) => prev.map((p) => (p.id === projectId ? updated : p)));
+      showSuccess(
+        currentFeatured
+          ? "Project removed from featured."
+          : "Project marked as featured."
+      );
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to update featured status.");
+    } finally {
+      setActionLoading(false);
     }
   }
 
@@ -488,7 +524,10 @@ export default function Admin() {
     setError("");
     try {
       if (isEditing) {
-        const res = await api.patch(`/admin/projects/${editingProjectId}`, projectForm);
+        const res = await api.patch(
+          `/admin/projects/${editingProjectId}`,
+          projectForm
+        );
         setProjects((prev) =>
           prev.map((p) => (p.id === editingProjectId ? res.data : p))
         );
@@ -513,7 +552,9 @@ export default function Admin() {
       {rejectModal && (
         <RejectModal
           title={rejectModal.name}
-          onConfirm={rejectModal.type === "user" ? handleRejectUser : handleRejectProject}
+          onConfirm={
+            rejectModal.type === "user" ? handleRejectUser : handleRejectProject
+          }
           onCancel={() => setRejectModal(null)}
           loading={actionLoading}
         />
@@ -588,10 +629,12 @@ export default function Admin() {
                   <SidebarItem
                     active={activeView === "create"}
                     label="Create Project"
-                    onClick={() => { resetProjectForm(); setActiveView("create"); }}
+                    onClick={() => {
+                      resetProjectForm();
+                      setActiveView("create");
+                    }}
                   />
                 </nav>
-
                 <div className="mt-6 pt-4 border-t border-slate-100">
                   <p className="text-xs text-slate-400 leading-relaxed">
                     Badges show pending items requiring your attention.
@@ -606,7 +649,6 @@ export default function Admin() {
               {/* ── DASHBOARD ── */}
               {activeView === "dashboard" && (
                 <div className="space-y-6">
-                  {/* Stat grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                     <StatCard label="Total Users" value={totals.totalUsers} color="blue" />
                     <StatCard label="Verified Users" value={totals.verifiedUsers} color="green" />
@@ -618,20 +660,23 @@ export default function Admin() {
                     <StatCard label="Total Judges" value={totals.totalJudges} color="slate" />
                   </div>
 
-                  {/* Quick action banners */}
                   {(pendingRegistrationsCount > 0 || pendingProjectsCount > 0) && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {pendingRegistrationsCount > 0 && (
                         <button
                           type="button"
-                          onClick={() => { setUserStatusFilter("pending"); setActiveView("registrations"); }}
+                          onClick={() => {
+                            setUserStatusFilter("pending");
+                            setActiveView("registrations");
+                          }}
                           className="text-left bg-yellow-50 border border-yellow-200 rounded-2xl p-4 hover:bg-yellow-100 transition-colors"
                         >
                           <p className="text-xs font-bold text-yellow-700 uppercase tracking-wide">
                             Action Required
                           </p>
                           <p className="text-xl font-bold text-yellow-900 mt-1">
-                            {pendingRegistrationsCount} pending registration{pendingRegistrationsCount !== 1 ? "s" : ""}
+                            {pendingRegistrationsCount} pending registration
+                            {pendingRegistrationsCount !== 1 ? "s" : ""}
                           </p>
                           <p className="text-sm text-yellow-700 mt-0.5">
                             Click to review &rarr;
@@ -641,14 +686,18 @@ export default function Admin() {
                       {pendingProjectsCount > 0 && (
                         <button
                           type="button"
-                          onClick={() => { setProjectStatusFilter("pending"); setActiveView("projects"); }}
+                          onClick={() => {
+                            setProjectStatusFilter("pending");
+                            setActiveView("projects");
+                          }}
                           className="text-left bg-blue-50 border border-blue-200 rounded-2xl p-4 hover:bg-blue-100 transition-colors"
                         >
                           <p className="text-xs font-bold text-blue-700 uppercase tracking-wide">
                             Action Required
                           </p>
                           <p className="text-xl font-bold text-blue-900 mt-1">
-                            {pendingProjectsCount} pending project{pendingProjectsCount !== 1 ? "s" : ""}
+                            {pendingProjectsCount} pending project
+                            {pendingProjectsCount !== 1 ? "s" : ""}
                           </p>
                           <p className="text-sm text-blue-700 mt-0.5">
                             Click to review &rarr;
@@ -658,7 +707,6 @@ export default function Admin() {
                     </div>
                   )}
 
-                  {/* Recent activity */}
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div className="bg-white border border-slate-200 rounded-2xl p-5">
                       <h2 className="text-base font-semibold text-slate-900 mb-3">
@@ -710,22 +758,22 @@ export default function Admin() {
               {/* ── REGISTRATIONS ── */}
               {activeView === "registrations" && (
                 <div className="space-y-4">
-                  {/* Count pills */}
                   <div className="flex flex-wrap gap-2">
                     {[
-                      { label: "Pending", value: "pending", count: userCounts.pending, color: "yellow" },
-                      { label: "Approved", value: "approved", count: userCounts.approved, color: "green" },
-                      { label: "Rejected", value: "rejected", count: userCounts.rejected, color: "red" },
-                      { label: "All", value: "all", count: userCounts.all, color: "slate" },
+                      { label: "Pending", value: "pending", count: userCounts.pending },
+                      { label: "Approved", value: "approved", count: userCounts.approved },
+                      { label: "Rejected", value: "rejected", count: userCounts.rejected },
+                      { label: "All", value: "all", count: userCounts.all },
                     ].map((f) => (
                       <button
                         key={f.value}
                         type="button"
                         onClick={() => setUserStatusFilter(f.value)}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${userStatusFilter === f.value
+                        className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                          userStatusFilter === f.value
                             ? "bg-blue-600 text-white border-blue-600"
                             : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-                          }`}
+                        }`}
                       >
                         {f.label} ({f.count})
                       </button>
@@ -733,7 +781,6 @@ export default function Admin() {
                   </div>
 
                   <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                    {/* Table header */}
                     <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                       <div>
                         <h2 className="text-base font-semibold text-slate-900">
@@ -850,7 +897,6 @@ export default function Admin() {
               {/* ── PROJECTS ── */}
               {activeView === "projects" && (
                 <div className="space-y-4">
-                  {/* Count pills */}
                   <div className="flex flex-wrap gap-2">
                     {[
                       { label: "Pending", value: "pending", count: projectCounts.pending },
@@ -862,10 +908,11 @@ export default function Admin() {
                         key={f.value}
                         type="button"
                         onClick={() => setProjectStatusFilter(f.value)}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${projectStatusFilter === f.value
+                        className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                          projectStatusFilter === f.value
                             ? "bg-blue-600 text-white border-blue-600"
                             : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-                          }`}
+                        }`}
                       >
                         {f.label} ({f.count})
                       </button>
@@ -875,7 +922,9 @@ export default function Admin() {
                   <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                     <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                       <div>
-                        <h2 className="text-base font-semibold text-slate-900">Project Moderation</h2>
+                        <h2 className="text-base font-semibold text-slate-900">
+                          Project Moderation
+                        </h2>
                         <p className="text-sm text-slate-500">
                           Review submissions. Only approved projects appear publicly.
                         </p>
@@ -897,6 +946,7 @@ export default function Admin() {
                             <th className="text-left px-4 py-3">Team</th>
                             <th className="text-left px-4 py-3">Department</th>
                             <th className="text-left px-4 py-3">Status</th>
+                            <th className="text-left px-4 py-3">Featured</th>
                             <th className="text-left px-4 py-3">Submitted</th>
                             <th className="text-left px-4 py-3">Actions</th>
                           </tr>
@@ -921,6 +971,15 @@ export default function Admin() {
                                   <div className="text-xs text-slate-500 mt-1 max-w-[160px] line-clamp-2">
                                     {p.rejectionReason}
                                   </div>
+                                )}
+                              </td>
+                              <td className="px-4 py-3">
+                                {p.isFeatured ? (
+                                  <span className="text-xs font-bold text-yellow-600">
+                                    ★ Yes
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-slate-400">—</span>
                                 )}
                               </td>
                               <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">
@@ -968,6 +1027,22 @@ export default function Admin() {
                                   >
                                     Edit
                                   </button>
+                                  {p.status === "approved" && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleToggleFeatured(p.id, p.isFeatured)
+                                      }
+                                      disabled={actionLoading}
+                                      className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors ${
+                                        p.isFeatured
+                                          ? "bg-yellow-100 hover:bg-yellow-200 text-yellow-800"
+                                          : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                                      }`}
+                                    >
+                                      {p.isFeatured ? "★ Unfeature" : "☆ Feature"}
+                                    </button>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteProject(p.id)}
@@ -982,7 +1057,7 @@ export default function Admin() {
                           {filteredProjects.length === 0 && (
                             <tr>
                               <td
-                                colSpan={7}
+                                colSpan={8}
                                 className="px-4 py-8 text-center text-slate-400 text-sm"
                               >
                                 No projects match the current filters.
@@ -994,7 +1069,7 @@ export default function Admin() {
                     </div>
                   </div>
 
-                  {/* Inline edit form — appears below table when editing */}
+                  {/* Inline edit form */}
                   {isEditing && (
                     <div className="bg-white border border-blue-200 rounded-2xl p-5">
                       <div className="flex items-center justify-between mb-4">

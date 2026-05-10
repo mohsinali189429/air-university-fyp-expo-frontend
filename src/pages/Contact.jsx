@@ -4,7 +4,7 @@ import api from "../api/axios.js";
 const contactInfo = [
   { icon: "📍", label: "Address", value: "Air University, PAF Complex E-9, Islamabad, Pakistan" },
   { icon: "📧", label: "Email", value: "fyp@au.edu.pk" },
-  { icon: "📞", label: "Phone", value: "+92-51-9262557" },
+  { icon: "📞", label: "Phone", value: "+92317-8855009" },
   { icon: "🕐", label: "Office Hours", value: "Mon–Fri, 9:00 AM – 5:00 PM" },
 ];
 
@@ -96,20 +96,12 @@ export default function Contact() {
               <div className="space-y-2">
                 
                 <a
-                  href="https://www.au.edu.pk"
+                  href="https://aack.au.edu.pk/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
                 >
                   🌐 Air University Website
-                </a>
-                <a
-                  href="https://www.au.edu.pk/pages/Faculties/CS_AI/main.aspx"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
-                >
-                  💻 Faculty of CS & AI
                 </a>
               </div>
             </div>
@@ -156,7 +148,6 @@ export default function Contact() {
                       value={form.name}
                       onChange={handleChange}
                       required
-                      placeholder="Muhammad Ali"
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
@@ -172,7 +163,7 @@ export default function Contact() {
                       value={form.email}
                       onChange={handleChange}
                       required
-                      placeholder="ali@au.edu.pk"
+                      placeholder="you@gmail.com"
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
