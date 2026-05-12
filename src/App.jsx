@@ -19,10 +19,12 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Admin from "./pages/Admin.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 export default function App() {
   return (
     <BrowserRouter>
+     <ScrollToTop />
       <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
         <Navbar />
         <main className="flex-1">
