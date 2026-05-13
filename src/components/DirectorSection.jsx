@@ -37,7 +37,7 @@ export default function DirectorSection() {
             </div>
             
             <div className="border-l-4 border-blue-600 pl-6 mt-2">
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Air Vice Marshal SHMAS UL HAQ</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">AIR VICE MARSHAL SHAMS UL HAQ</h3>
               <p className="text-blue-600 font-medium">Director Campus</p>
             </div>
           </div>
